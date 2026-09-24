@@ -4,7 +4,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## What This Is
 
-FastNEAR docs generation and verification repo. It owns the OpenAPI sync pipeline, per-operation leaf specs, enhancement manifests, generated page models, and the local standalone verification runtime. The Redocly runtime has been removed.
+FastNEAR docs generation and verification repo. It owns the OpenAPI sync pipeline, per-operation leaf specs, enhancement manifests, generated page models, and the local standalone verification runtime.
 
 The consumer-facing site is [builder-docs](https://github.com/fastnear/builder-docs), which renders public API and RPC pages directly at [docs.fastnear.com](https://docs.fastnear.com).
 
@@ -50,7 +50,7 @@ This layer is intentionally separate from OpenAPI:
 
 ### Standalone Verification Runtime (`standalone/`, `scripts/standalone-*.js`)
 
-The standalone runtime is a bespoke, Redocly-free verification surface: `scripts/standalone-dev.js` serves the canonical `/rpcs/...` and `/apis/...` routes from generated page models on `http://127.0.0.1:4010`, and `scripts/standalone-build.js` emits a static bundle to `standalone-dist/`. `scripts/standalone-common.js` enforces that no `@redocly/*` modules sneak back into the source tree or the built bundle.
+The standalone runtime is a bespoke verification surface: `scripts/standalone-dev.js` serves the canonical `/rpcs/...` and `/apis/...` routes from generated page models on `http://127.0.0.1:4010`, and `scripts/standalone-build.js` emits a static bundle to `standalone-dist/`.
 
 ### URL Patterns
 

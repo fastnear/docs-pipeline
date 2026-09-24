@@ -6,7 +6,7 @@ This file is the front door for repo continuity. Keep it short, high-signal, and
 
 FastNEAR docs backend and generation repo. Public docs now render in `builder-docs` at `docs.fastnear.com`; this repo owns spec sync, enhancement manifests, page-model generation, and the local verification runtimes that support the shipped experience.
 
-The local verification surface is the standalone bespoke runtime in this repo; the Redocly runtime has been removed.
+The local verification surface is the standalone bespoke runtime in this repo.
 
 ## Quick Start
 
@@ -33,7 +33,6 @@ npm run smoke:operations      # Smoke-check representative canonical routes agai
 
 ## Ongoing Work
 
-- Use [API_DOCS_ROLLOUT.md](API_DOCS_ROLLOUT.md) as the tracker for remaining polish, host cutover cleanup, and post-Redocly simplification.
 - Keep portal-owned interaction metadata out of the upstream contract and out of sibling service repos. REST services use `enhancements/<service>/manifest.yaml`; RPC operations use `scripts/rpc-example-config.js` (RPC cannot use enhancement manifests today — the two page-spec lists are disjoint).
 - Endpoints are contract, but *which* endpoint a docs example executes against is portal-owned. Declare servers via `DEFAULT_SERVERS` in `scripts/generate-from-nearcore.js`; declare an example's archival requirement in `ARCHIVAL_EXAMPLES`. Never hand-edit `servers:` in a generated leaf spec — `npm run generate-rpc` rebuilds those files from scratch and will silently revert it.
 - Prefer upstream contract-quality improvements only: descriptions, examples, enum clarity, nullable semantics, and stable `operationId`s.
@@ -74,7 +73,6 @@ npm run smoke:operations      # Smoke-check representative canonical routes agai
 
 - [PORTAL_WORKFLOW.md](PORTAL_WORKFLOW.md): operational checklist for sync, lint, standalone build, and publication.
 - [INTEGRATION_GUIDE.md](INTEGRATION_GUIDE.md): current contract between generation in `mike-docs` and rendering in `builder-docs`.
-- [API_DOCS_ROLLOUT.md](API_DOCS_ROLLOUT.md): rollout tracker for service-by-service API onboarding.
 - [SERVICE_ONBOARDING_CHECKLIST.md](SERVICE_ONBOARDING_CHECKLIST.md): canonical checklist for onboarding a new REST API service into the docs stack.
 
 ## Continuity Rules

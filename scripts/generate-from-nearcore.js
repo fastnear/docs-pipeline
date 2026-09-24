@@ -3,7 +3,7 @@
  * generate-from-nearcore.js
  *
  * Reads nearcore's auto-generated openapi.json and produces/updates
- * per-operation YAML files under rpcs/ for Redocly to render.
+ * per-operation YAML files under rpcs/ for the page-model generator to consume.
  *
  * Usage:
  *   node scripts/generate-from-nearcore.js [path-to-openapi.json]

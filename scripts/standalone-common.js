@@ -20,11 +20,6 @@ const STANDALONE_ROUTES = Array.from(
 const STANDALONE_DEV_OUTDIR = path.resolve(ROOT, ".standalone-dev");
 const STANDALONE_BUILD_OUTDIR = path.resolve(ROOT, "standalone-dist");
 const STANDALONE_ENTRY = path.resolve(ROOT, "standalone/src/app.tsx");
-const NO_REDOCLY_IMPORT_PATTERNS = [
-  /from\s+["']@redocly\//,
-  /require\(\s*["']@redocly\//,
-  /import\(\s*["']@redocly\//,
-];
 const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
   ".html": "text/html; charset=utf-8",
@@ -51,56 +46,6 @@ function listFiles(dir) {
   }
 
   return files;
-}
-
-function ensureNoRedoclyImportsInSource() {
-  const sourceRoots = [
-    path.resolve(ROOT, "standalone"),
-    path.resolve(ROOT, "shared"),
-  ];
-  const failures = [];
-
-  for (const sourceRoot of sourceRoots) {
-    if (!fs.existsSync(sourceRoot)) {
-      continue;
-    }
-
-    const files = fs.statSync(sourceRoot).isDirectory() ? listFiles(sourceRoot) : [sourceRoot];
-    for (const filePath of files) {
-      if (!/\.(css|html|js|json|md|tsx?|txt)$/.test(filePath)) {
-        continue;
-      }
-
-      const contents = fs.readFileSync(filePath, "utf8");
-      if (NO_REDOCLY_IMPORT_PATTERNS.some((pattern) => pattern.test(contents))) {
-        failures.push(path.relative(ROOT, filePath));
-      }
-    }
-  }
-
-  if (failures.length > 0) {
-    throw new Error(
-      `Standalone verification runtime must not import @redocly runtime modules. Found violations in: ${failures.join(
-        ", "
-      )}`
-    );
-  }
-}
-
-function ensureBuiltBundleIsRedoclyFree(metafile) {
-  if (!metafile?.inputs) {
-    return;
-  }
-
-  const failures = Object.keys(metafile.inputs)
-    .map((inputPath) => inputPath.replace(/\\/g, "/"))
-    .filter((inputPath) => inputPath.includes("/node_modules/@redocly/"));
-
-  if (failures.length > 0) {
-    throw new Error(
-      `Standalone bundle unexpectedly depends on Redocly runtime files: ${failures.join(", ")}`
-    );
-  }
 }
 
 function getHtmlDocument() {
@@ -177,7 +122,6 @@ function writeStandaloneArtifacts(outdir) {
 }
 
 async function buildStandaloneApp(outdir, { watch = false } = {}) {
-  ensureNoRedoclyImportsInSource();
   writeStandaloneArtifacts(outdir);
 
   if (watch) {
@@ -187,7 +131,6 @@ async function buildStandaloneApp(outdir, { watch = false } = {}) {
   }
 
   const result = await build(buildOptions(outdir));
-  ensureBuiltBundleIsRedoclyFree(result.metafile);
   return null;
 }
 
@@ -264,8 +207,6 @@ module.exports = {
   STANDALONE_ROUTES,
   buildStandaloneApp,
   createStandaloneServer,
-  ensureBuiltBundleIsRedoclyFree,
-  ensureNoRedoclyImportsInSource,
   watchStandaloneModel,
   writeStandaloneArtifacts,
 };
