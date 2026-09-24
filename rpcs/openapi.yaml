@@ -4,7 +4,7 @@ info:
   description: |-
     NEAR Protocol JSON RPC
 
-    No API key is required. A FastNEAR API key raises rate limits; send it as an `Authorization: Bearer` header (preferred) or an `apiKey` query parameter. An unrecognized key is rejected with 403 rather than falling back to public access.
+    Send your FastNEAR API key as an `Authorization: Bearer` header (preferred) or an `apiKey` query parameter. An unrecognized key is rejected with 403.
 
     For exhaustive list of endpoints, refer to the [NEAR documentation](https://docs.near.org/api/rpc/transactions).
   version: "1.0.0"
