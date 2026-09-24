@@ -261,7 +261,15 @@ function summarizeAuth(securitySchemes) {
   return parts.join("; ");
 }
 
+// Published OpenAPI documents live under /openapi/<spec family>; every RPC
+// sub-family shares the single rpc bundle.
+function getFamilyOpenApiPaths(definition) {
+  const specFamily = definition.kind === "rpc" ? "rpc" : definition.key;
+  return { openapiPath: `/openapi/${specFamily}.json`, openapiYamlPath: `/openapi/${specFamily}.yaml` };
+}
+
 function buildFamilyEntityFromDefinition(definition) {
+  const { openapiPath, openapiYamlPath } = getFamilyOpenApiPaths(definition);
   return {
     description: definition.description,
     docsPath: definition.docsPath,
@@ -270,6 +278,8 @@ function buildFamilyEntityFromDefinition(definition) {
     key: definition.key,
     kind: definition.kind,
     name: definition.name,
+    openapiPath,
+    openapiYamlPath,
     schemaType: "WebAPI",
   };
 }
@@ -292,6 +302,9 @@ function buildOperationEntity(pageModel) {
     id: pageModel.pageModelId,
     name: pageModel.info.title,
     networkKeys: (pageModel.interaction.networks || []).map((network) => network.key),
+    openapiFamilyPath: pageModel.openapi?.familyJson || null,
+    openapiPath: pageModel.openapi?.json || null,
+    openapiPointer: pageModel.openapi?.pointer || null,
     operationId: pageModel.info.operationId,
     pageModelId: pageModel.pageModelId,
     requestPath: pageModel.route.path,

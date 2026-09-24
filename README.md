@@ -203,6 +203,7 @@ Some operations are `custom` type (not derived from nearcore), such as `metrics`
 2. `mike-docs` compiles portal-owned enhancements, page models, and structured graph metadata.
 3. Generated page models are vendored into `builder-docs/src/data/generatedFastnearPageModels.json`.
 4. Generated structured graph metadata is vendored into `builder-docs/src/data/generatedFastnearStructuredGraph.json`.
+   Published OpenAPI documents (`shared/openapi/`: an index, one bundle per spec family, one document per operation) are vendored into `builder-docs/static/openapi/` by the same run.
 5. `builder-docs` renders the root-mounted public wrapper routes natively with `FastnearDirectOperation`, including `/rpc/**`, `/api/**`, `/tx/**`, `/transfers/**`, `/neardata/**`, `/fastdata/kv/**`, `/auth/**`, and `/agents/**`.
 6. `builder-docs` also generates canonical hosted `/rpcs/**` and `/apis/**` pages from the same models.
 7. `builder-docs` emits centralized JSON-LD and a public `/structured-data/site-graph.json` artifact from the same shared graph.

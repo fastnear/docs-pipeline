@@ -7,6 +7,7 @@ const { auditPageModels } = require("./audit-page-model-routes");
 const { buildGeneratedStructuredGraph, auditGeneratedStructuredGraph } = require("./structured-graph-common");
 const { readGeneratedNearcoreSourceJson } = require("./nearcore-source-metadata");
 const { getArchivalExample } = require("./rpc-example-config");
+const { buildOpenApiArtifacts, writeOpenApiArtifacts } = require("./generate-openapi-artifacts");
 
 const ROOT = path.resolve(__dirname, "..");
 const ENHANCEMENTS_ROOT = path.resolve(ROOT, "enhancements");
@@ -1327,6 +1328,8 @@ function writeGeneratedFastnearStructuredGraphJson(graph) {
 function writeGeneratedPageModelArtifacts() {
   const models = buildPageModels();
   auditPageModels(models);
+  // Attaches `openapi` to every model and prepares the published spec documents.
+  const openapiArtifacts = buildOpenApiArtifacts(models);
   const nearcoreSource = readGeneratedNearcoreSourceJson();
   const structuredGraph = buildGeneratedStructuredGraph(models, {
     metadata: nearcoreSource ? { nearcoreSource } : undefined,
@@ -1336,6 +1339,7 @@ function writeGeneratedPageModelArtifacts() {
   writeGeneratedFastnearPageModelsJson(models);
   writeGeneratedFastnearStructuredGraphModule(structuredGraph);
   writeGeneratedFastnearStructuredGraphJson(structuredGraph);
+  writeOpenApiArtifacts(openapiArtifacts);
   return models;
 }
 
