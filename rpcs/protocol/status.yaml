@@ -62,7 +62,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/JsonRpcResponse"
+        403:
+          description: The supplied API key was not recognized. Omit the key to use public access.
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: Invalid API key
 security:
+  - {}
   - BearerAuth: []
   - ApiKeyAuth: []
 components:
@@ -70,12 +78,12 @@ components:
     BearerAuth:
       type: http
       scheme: bearer
-      description: "FastNEAR API key sent as an `Authorization: Bearer` header; recommended when you control the client."
+      description: "FastNEAR API key as an `Authorization: Bearer` header. Preferred for backends, workers, and proxies because it keeps the key out of URLs and logs."
     ApiKeyAuth:
       type: apiKey
       in: query
       name: apiKey
-      description: "FastNEAR API key as the `apiKey` query parameter; convenient for browsers, but the key appears in URLs and logs."
+      description: "FastNEAR API key as the `apiKey` query parameter. Handy for curl or clients that cannot set headers, but the key can end up in URLs, logs, and shell history."
   schemas:
     JsonRpcResponse:
       type: object
@@ -132,10 +140,10 @@ components:
               minimum: 0
             node_key:
               type: [string, "null"]
-              description: "ed25519: or secp256k1: prefixed public key"
+              description: "Public key with its type prefix: ed25519:, secp256k1:, or the full ml-dsa-65: key (never the ml-dsa-65-hash: handle)."
             node_public_key:
               type: string
-              description: "ed25519: or secp256k1: prefixed public key"
+              description: "Public key with its type prefix: ed25519:, secp256k1:, or the full ml-dsa-65: key (never the ml-dsa-65-hash: handle)."
             protocol_version:
               type: integer
               description: Currently active protocol version.
@@ -193,7 +201,7 @@ components:
               description: NEAR account ID
             validator_public_key:
               type: [string, "null"]
-              description: "ed25519: or secp256k1: prefixed public key"
+              description: "Public key with its type prefix: ed25519:, secp256k1:, or the full ml-dsa-65: key (never the ml-dsa-65-hash: handle)."
             validators:
               type: array
               items:
