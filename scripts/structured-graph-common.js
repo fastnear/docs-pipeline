@@ -238,7 +238,7 @@ function getOperationDocsPath(canonicalPath) {
   return null;
 }
 
-function summarizeAuth(securitySchemes) {
+function summarizeAuth(securitySchemes, securityOptional = false) {
   if (!Array.isArray(securitySchemes) || securitySchemes.length === 0) {
     return "No auth required";
   }
@@ -255,7 +255,8 @@ function summarizeAuth(securitySchemes) {
     return scheme.description || `${scheme.type || "auth"} ${scheme.id || ""}`.trim();
   });
 
-  return parts.join("; ");
+  const summary = parts.join("; ");
+  return securityOptional ? `Optional; ${summary}` : summary;
 }
 
 function buildFamilyEntityFromDefinition(definition) {
@@ -279,7 +280,7 @@ function buildOperationEntity(pageModel) {
   assert(docsPath, `No docsPath mapping for ${pageModel.pageModelId}: ${pageModel.canonicalPath}`);
 
   return {
-    authSummary: summarizeAuth(pageModel.securitySchemes),
+    authSummary: summarizeAuth(pageModel.securitySchemes, pageModel.securityOptional === true),
     canonicalPath: pageModel.canonicalPath,
     description: pageModel.info.description,
     docsPath,

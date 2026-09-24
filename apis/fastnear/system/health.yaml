@@ -8,13 +8,6 @@ paths:
     get:
       description: "Ping the FastNEAR API for liveness — returns `{status: ok}` when healthy."
       operationId: get_health
-      parameters:
-        - description: Optional API key forwarded by embedded portal clients. The public FastNEAR API does not require it.
-          in: query
-          name: apiKey
-          required: false
-          schema:
-            type: string
       responses:
         "200":
           content:
@@ -24,6 +17,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/HealthResponse"
           description: Health status string
+        "403":
+          content:
+            text/plain:
+              example: Invalid API key
+              schema:
+                type: string
+          description: The supplied API key was not recognized. Omit the key to use public access.
         "500":
           content:
             application/json:
@@ -38,6 +38,10 @@ servers:
     url: https://api.fastnear.com
   - description: Testnet
     url: https://test.api.fastnear.com
+security:
+  - {}
+  - BearerAuth: []
+  - ApiKeyAuth: []
 components:
   schemas:
     AccountBalanceRow:
@@ -274,3 +278,13 @@ components:
         - account_id
         - pools
       type: object
+  securitySchemes:
+    ApiKeyAuth:
+      description: FastNEAR API key as the `apiKey` query parameter. Handy for curl or clients that cannot set headers, but the key can end up in URLs, logs, and shell history.
+      in: query
+      name: apiKey
+      type: apiKey
+    BearerAuth:
+      description: "FastNEAR API key as an `Authorization: Bearer` header. Preferred for backends, workers, and proxies because it keeps the key out of URLs and logs."
+      scheme: bearer
+      type: http

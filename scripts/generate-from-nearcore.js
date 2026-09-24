@@ -487,6 +487,42 @@ function resolveDescription(spec, op, existingYaml) {
   return { description, source };
 }
 
+// ---------------------------------------------------------------------------
+// FastNEAR gateway auth
+// ---------------------------------------------------------------------------
+// Every JSON-RPC method works without a key; a FastNEAR API key raises rate
+// limits and may be sent as an `Authorization: Bearer` header or an `apiKey`
+// query parameter. The empty requirement `{}` listed first is what makes the
+// key optional in OpenAPI terms. The gateway rejects an unrecognized key with
+// 403 text/plain "Invalid API key" instead of falling back to public access.
+// Wording mirrors fastnear-api-server-rs src/openapi.rs `set_security` so the
+// RPC and REST surfaces read the same.
+const FASTNEAR_SECURITY_SCHEMES = {
+  BearerAuth: {
+    type: 'http',
+    scheme: 'bearer',
+    description:
+      'FastNEAR API key as an `Authorization: Bearer` header. Preferred for backends, workers, and proxies because it keeps the key out of URLs and logs.',
+  },
+  ApiKeyAuth: {
+    type: 'apiKey',
+    in: 'query',
+    name: 'apiKey',
+    description:
+      'FastNEAR API key as the `apiKey` query parameter. Handy for curl or clients that cannot set headers, but the key can end up in URLs, logs, and shell history.',
+  },
+};
+const FASTNEAR_SECURITY = [{}, { BearerAuth: [] }, { ApiKeyAuth: [] }];
+const INVALID_API_KEY_RESPONSE = {
+  description: 'The supplied API key was not recognized. Omit the key to use public access.',
+  content: {
+    'text/plain': {
+      schema: { type: 'string' },
+      example: 'Invalid API key',
+    },
+  },
+};
+
 /**
  * Build the full operation YAML structure for a given operation config entry.
  */
@@ -524,6 +560,7 @@ function buildOperationYaml(spec, op, existingYaml) {
           },
         },
       },
+      '403': clone(INVALID_API_KEY_RESPONSE),
     },
   };
 
@@ -541,23 +578,9 @@ function buildOperationYaml(spec, op, existingYaml) {
         post: postOperation,
       },
     },
-    security: [{ BearerAuth: [] }, { ApiKeyAuth: [] }],
+    security: clone(FASTNEAR_SECURITY),
     components: {
-      securitySchemes: {
-        BearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          description:
-            'FastNEAR API key sent as an `Authorization: Bearer` header; recommended when you control the client.',
-        },
-        ApiKeyAuth: {
-          type: 'apiKey',
-          in: 'query',
-          name: 'apiKey',
-          description:
-            'FastNEAR API key as the `apiKey` query parameter; convenient for browsers, but the key appears in URLs and logs.',
-        },
-      },
+      securitySchemes: clone(FASTNEAR_SECURITY_SCHEMES),
       schemas: {
         JsonRpcResponse: buildJsonRpcResponseSchema(responseResult, existingYaml),
       },
@@ -1315,6 +1338,8 @@ function generateAggregateYaml(operations) {
     '  description: |-',
     '    NEAR Protocol JSON RPC',
     '',
+    '    No API key is required. A FastNEAR API key raises rate limits; send it as an `Authorization: Bearer` header (preferred) or an `apiKey` query parameter. An unrecognized key is rejected with 403 rather than falling back to public access.',
+    '',
     '    For exhaustive list of endpoints, refer to the [NEAR documentation](https://docs.near.org/api/rpc/transactions).',
     '  version: "1.0.0"',
     'servers:',
@@ -1351,6 +1376,14 @@ function generateAggregateYaml(operations) {
     }
     lines.push('');
   }
+
+  // Document-level auth applies to every $ref'd operation.
+  lines.push(
+    toYaml({
+      security: FASTNEAR_SECURITY,
+      components: { securitySchemes: FASTNEAR_SECURITY_SCHEMES },
+    })
+  );
 
   return lines.join('\n');
 }
