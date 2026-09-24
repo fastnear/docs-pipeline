@@ -77,6 +77,10 @@ function splitAggregateSpec(serviceSpec, destinationDir) {
   const renderedSpec = cloneJson(serviceSpec);
   const components = renderedSpec.components ? cloneJson(renderedSpec.components) : undefined;
   const servers = Array.isArray(renderedSpec.servers) ? cloneJson(renderedSpec.servers) : undefined;
+  // Document-level security applies to every operation that does not override it
+  // (OpenAPI 3.0.3 §4.7.1), so each leaf must carry it or the page-model generator
+  // sees no requirements and reports "No auth required".
+  const security = Array.isArray(renderedSpec.security) ? cloneJson(renderedSpec.security) : undefined;
 
   fs.rmSync(destinationDir, { recursive: true, force: true });
   fs.mkdirSync(destinationDir, { recursive: true });
@@ -108,6 +112,10 @@ function splitAggregateSpec(serviceSpec, destinationDir) {
 
       if (servers) {
         leafSpec.servers = cloneJson(servers);
+      }
+
+      if (security) {
+        leafSpec.security = cloneJson(security);
       }
 
       if (components && Object.keys(components).length > 0) {
