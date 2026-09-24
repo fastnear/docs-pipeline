@@ -634,13 +634,21 @@ function getFieldLabel(name, schema) {
   }
 }
 
+// Returns { schemes, optional }. `optional` is true when the requirement list
+// contains an empty object ({}), which in OpenAPI means "no auth is also
+// acceptable"; consumers otherwise read a scheme list as a hard requirement.
 function normalizeSecuritySchemes(document, operation, parameters) {
   const definitions = document.components?.securitySchemes || {};
   const operationRequirements = operation.security || document.security || [];
   const usedIds = new Set();
+  let optional = false;
 
   for (const requirement of operationRequirements) {
-    for (const id of Object.keys(requirement || {})) {
+    const ids = Object.keys(requirement || {});
+    if (ids.length === 0) {
+      optional = true;
+    }
+    for (const id of ids) {
       usedIds.add(id);
     }
   }
@@ -662,27 +670,30 @@ function normalizeSecuritySchemes(document, operation, parameters) {
   });
 
   if (schemes.length > 0) {
-    return schemes;
+    return { optional, schemes };
   }
 
   const apiKeyParameter = parameters.find(
     (parameter) => parameter?.in === "query" && parameter?.name === "apiKey"
   );
   if (!apiKeyParameter) {
-    return [];
+    return { optional: false, schemes: [] };
   }
 
-  return [
-    {
-      description:
-        apiKeyParameter.description ||
-        "The OpenAPI contract describes the FastNEAR API key as a query parameter named apiKey.",
-      id: "ApiKeyAuth",
-      in: "query",
-      name: "apiKey",
-      type: "apiKey",
-    },
-  ];
+  return {
+    optional: false,
+    schemes: [
+      {
+        description:
+          apiKeyParameter.description ||
+          "The OpenAPI contract describes the FastNEAR API key as a query parameter named apiKey.",
+        id: "ApiKeyAuth",
+        in: "query",
+        name: "apiKey",
+        type: "apiKey",
+      },
+    ],
+  };
 }
 
 function normalizeResponses(document, responses) {
@@ -1218,6 +1229,7 @@ function buildStandalonePageModel(pageSpec) {
     transport === "json-rpc"
       ? buildRpcSections(pageSpec, document, operation)
       : buildHttpSections(pageSpec, document, operation, parameters);
+  const security = normalizeSecuritySchemes(document, operation, parameters);
 
   return {
     canonicalPath: pageSpec.canonicalPath,
@@ -1239,7 +1251,8 @@ function buildStandalonePageModel(pageSpec) {
       transport,
     },
     routeAliases: pageSpec.routeAliases || [],
-    securitySchemes: normalizeSecuritySchemes(document, operation, parameters),
+    ...(security.optional && security.schemes.length > 0 ? { securityOptional: true } : {}),
+    securitySchemes: security.schemes,
     sourceSpec: toPosixRelative(pageSpec.sourceSpec),
   };
 }
