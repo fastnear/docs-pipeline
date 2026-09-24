@@ -490,13 +490,13 @@ function resolveDescription(spec, op, existingYaml) {
 // ---------------------------------------------------------------------------
 // FastNEAR gateway auth
 // ---------------------------------------------------------------------------
-// Every JSON-RPC method works without a key; a FastNEAR API key raises rate
-// limits and may be sent as an `Authorization: Bearer` header or an `apiKey`
-// query parameter. The empty requirement `{}` listed first is what makes the
-// key optional in OpenAPI terms. The gateway rejects an unrecognized key with
-// 403 text/plain "Invalid API key" instead of falling back to public access.
-// Wording mirrors fastnear-api-server-rs src/openapi.rs `set_security` so the
-// RPC and REST surfaces read the same.
+// A FastNEAR API key may be sent as an `Authorization: Bearer` header or an
+// `apiKey` query parameter. The empty requirement `{}` mirrors the gateway
+// contract as it stands; the docs deliberately do not describe or advertise
+// keyless access anywhere in prose, labels, or response text. The gateway
+// rejects an unrecognized key with 403 text/plain "Invalid API key". Wording
+// mirrors fastnear-api-server-rs src/openapi.rs `set_security` so the RPC and
+// REST surfaces read the same.
 const FASTNEAR_SECURITY_SCHEMES = {
   BearerAuth: {
     type: 'http',
@@ -514,7 +514,7 @@ const FASTNEAR_SECURITY_SCHEMES = {
 };
 const FASTNEAR_SECURITY = [{}, { BearerAuth: [] }, { ApiKeyAuth: [] }];
 const INVALID_API_KEY_RESPONSE = {
-  description: 'The supplied API key was not recognized. Omit the key to use public access.',
+  description: 'The supplied API key was not recognized.',
   content: {
     'text/plain': {
       schema: { type: 'string' },
@@ -1338,7 +1338,7 @@ function generateAggregateYaml(operations) {
     '  description: |-',
     '    NEAR Protocol JSON RPC',
     '',
-    '    No API key is required. A FastNEAR API key raises rate limits; send it as an `Authorization: Bearer` header (preferred) or an `apiKey` query parameter. An unrecognized key is rejected with 403 rather than falling back to public access.',
+    '    Send your FastNEAR API key as an `Authorization: Bearer` header (preferred) or an `apiKey` query parameter. An unrecognized key is rejected with 403.',
     '',
     '    For exhaustive list of endpoints, refer to the [NEAR documentation](https://docs.near.org/api/rpc/transactions).',
     '  version: "1.0.0"',

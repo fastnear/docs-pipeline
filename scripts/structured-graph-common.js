@@ -238,9 +238,12 @@ function getOperationDocsPath(canonicalPath) {
   return null;
 }
 
-function summarizeAuth(securitySchemes, securityOptional = false) {
+// Neutral by design: the summary names the accepted credential forms and never
+// states whether a request works without one (see builder-docs CLAUDE.md,
+// "API key wording").
+function summarizeAuth(securitySchemes) {
   if (!Array.isArray(securitySchemes) || securitySchemes.length === 0) {
-    return "No auth required";
+    return "Not specified";
   }
 
   const parts = securitySchemes.map((scheme) => {
@@ -255,8 +258,7 @@ function summarizeAuth(securitySchemes, securityOptional = false) {
     return scheme.description || `${scheme.type || "auth"} ${scheme.id || ""}`.trim();
   });
 
-  const summary = parts.join("; ");
-  return securityOptional ? `Optional; ${summary}` : summary;
+  return parts.join("; ");
 }
 
 function buildFamilyEntityFromDefinition(definition) {
@@ -280,7 +282,7 @@ function buildOperationEntity(pageModel) {
   assert(docsPath, `No docsPath mapping for ${pageModel.pageModelId}: ${pageModel.canonicalPath}`);
 
   return {
-    authSummary: summarizeAuth(pageModel.securitySchemes, pageModel.securityOptional === true),
+    authSummary: summarizeAuth(pageModel.securitySchemes),
     canonicalPath: pageModel.canonicalPath,
     description: pageModel.info.description,
     docsPath,
