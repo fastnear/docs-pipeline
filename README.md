@@ -1,6 +1,6 @@
 # FastNEAR Docs Backend
 
-`mike-docs` is the docs backend and generation workspace for FastNEAR API and RPC docs. The public docs runtime lives in `builder-docs` at [docs.fastnear.com](https://docs.fastnear.com); this repo owns spec sync, enhancement manifests, page-model generation, and the local standalone verification runtime. The Redocly runtime has been removed.
+`mike-docs` is the docs backend and generation workspace for FastNEAR API and RPC docs. The public docs runtime lives in `builder-docs` at [docs.fastnear.com](https://docs.fastnear.com); this repo owns spec sync, enhancement manifests, page-model generation, and the local standalone verification runtime.
 
 ## Repository Structure
 
@@ -27,7 +27,7 @@ mike-docs/
 │   ├── transactions/
 │   └── transfers/
 ├── shared/                     # Shared generated registries, page-models, and runtime helpers
-├── standalone/                 # Local standalone verification runtime (bespoke; no Redocly)
+├── standalone/                 # Local standalone verification runtime (bespoke)
 ├── scripts/
 │   ├── check-external-openapi.js   # Workspace stale-spec check for sibling service repos
 │   ├── sync-external-apis.js       # Syncs aggregate specs, splits portal leaf files, regenerates page-model artifacts
@@ -40,7 +40,6 @@ mike-docs/
 ├── .github/workflows/
 │   └── portal-build.yml        # CI: sync, lint, standalone:build, upload standalone artifact
 ├── PORTAL_WORKFLOW.md          # How to work on, validate, and publish the docs pipeline
-├── API_DOCS_ROLLOUT.md         # Multi-repo rollout tracker
 └── package.json                # Scripts: lint, standalone:dev, standalone:build, verify:workspace, audits
 ```
 

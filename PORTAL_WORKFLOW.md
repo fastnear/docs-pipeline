@@ -1,6 +1,6 @@
 # Portal Workflow
 
-This document is the operational guide for working on the FastNEAR docs generation pipeline and the local standalone verification runtime in this repo. The Redocly runtime has been removed; `builder-docs` is the public presentation runtime at `https://docs.fastnear.com`.
+This document is the operational guide for working on the FastNEAR docs generation pipeline and the local standalone verification runtime in this repo. `builder-docs` is the public presentation runtime at `https://docs.fastnear.com`.
 
 If you are adding a brand-new REST API service, pair this guide with [SERVICE_ONBOARDING_CHECKLIST.md](SERVICE_ONBOARDING_CHECKLIST.md).
 
@@ -39,7 +39,7 @@ Optional env var:
 - `npm run check:external-openapi`
   Run `cargo run --features openapi --bin generate-openapi -- --check` across sibling service repos when the workspace is present.
 - `npm run lint`
-  Run `check:external-openapi` and `sync:apis` in sequence. OpenAPI validation is now handled by the upstream `cargo run --features openapi` check in each owning service repo rather than a separate Redocly lint step.
+  Run `check:external-openapi` and `sync:apis` in sequence. OpenAPI validation is now handled by the upstream `cargo run --features openapi` check in each owning service repo.
 - `npm run standalone:dev`
   Start the local standalone verification runtime on `http://127.0.0.1:4010` for canonical `/rpcs/...` and `/apis/...` pretty routes.
 - `npm run standalone:build`

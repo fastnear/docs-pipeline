@@ -10,7 +10,7 @@ There are three distinct layers:
 2. `mike-docs` is the generation pipeline plus local verification backends for API/RPC reference pages.
 3. Upstream service repos and nearcore remain the contract source of truth for most OpenAPI content.
 
-The main production experience runs through `builder-docs` and its hosted canonical `/rpcs/...` and `/apis/...` routes. The Redocly runtime has been removed; the local standalone runtime is the only in-repo verification surface.
+The main production experience runs through `builder-docs` and its hosted canonical `/rpcs/...` and `/apis/...` routes. The local standalone runtime is the only in-repo verification surface.
 
 The bespoke UI styling source of truth is `builder-docs/src/css/custom.css`. `mike-docs` stylesheets remain only as verification-oriented scaffolding for the standalone local runtime.
 
@@ -49,11 +49,11 @@ The bespoke UI styling source of truth is `builder-docs/src/css/custom.css`. `mi
 
 - `npm run standalone:dev` — dev server at `http://127.0.0.1:4010/<route>`
 - `npm run standalone:build` — static bundle at `standalone-dist/`
-- Intentionally bespoke, no Redocly runtime code; `scripts/standalone-common.js` enforces that with a source and bundle scan.
+- Intentionally bespoke; no third-party docs renderer.
 
 ## Current Architectural Split
 
-All docs pages are handled by the bespoke direct-render runtime in `builder-docs`, fed by the page models generated here. There is no Redocly-served slice left.
+All docs pages are handled by the bespoke direct-render runtime in `builder-docs`, fed by the page models generated here.
 
 ## High-Value Files
 

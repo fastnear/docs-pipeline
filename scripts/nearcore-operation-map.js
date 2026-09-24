@@ -425,7 +425,7 @@ const OPERATIONS = [
     description: "Scrape a node's operational counters and gauges in Prometheus text-exposition format.",
     note: 'HTTP endpoint, not JSON-RPC. Not in nearcore OpenAPI spec.',
     // metrics.yaml exposes GET /metrics, not the JSON-RPC `/` root. The
-    // aggregate $ref must point at the real path for Redocly to resolve.
+    // aggregate $ref must point at the real path for the aggregate bundler to resolve.
     aggregateRefPath: '/metrics',
   },
   {

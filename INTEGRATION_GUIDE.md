@@ -13,7 +13,7 @@ This document describes the current contract between generation in `mike-docs` a
 - generated page-model artifacts
 - the local standalone verification runtime
 
-Public docs pages are not iframe embeds. They render directly in `builder-docs` from the generated page models. The Redocly runtime has been removed from `mike-docs`.
+Public docs pages are not iframe embeds. They render directly in `builder-docs` from the generated page models.
 
 ## Shared Contract
 
@@ -137,4 +137,3 @@ That auto-height behavior comes from `FastnearHostedOperationPage`.
 
 - [/Users/mikepurvis/near/fn/builder-docs/README.md](/Users/mikepurvis/near/fn/builder-docs/README.md)
 - [/Users/mikepurvis/near/mike-docs/README.md](/Users/mikepurvis/near/mike-docs/README.md)
-- [/Users/mikepurvis/near/mike-docs/API_DOCS_ROLLOUT.md](/Users/mikepurvis/near/mike-docs/API_DOCS_ROLLOUT.md)

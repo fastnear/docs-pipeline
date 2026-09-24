@@ -43,9 +43,7 @@ function StandaloneApp() {
             <h1>{pageModel.info.title}</h1>
             <p className="standalone-view-account__hero-summary">{pageModel.info.description}</p>
             <div className="standalone-view-account__hero-note">
-              This page is a local custom runtime built from the generated page model with no
-              <code> @redocly/* </code>
-              renderer or hooks.
+              This page is a local custom runtime built from the generated page model.
             </div>
           </div>
 
