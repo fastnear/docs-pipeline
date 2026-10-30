@@ -193,6 +193,13 @@ const UPDATES = [
     },
   },
   {
+    file: 'transaction/tx.yaml',
+    params: {
+      tx_hash:            { mainnet: d => d.txHash,    testnet: d => d.txHash },
+      sender_account_id:  { mainnet: d => d.senderId,  testnet: d => d.senderId },
+    },
+  },
+  {
     file: 'transaction/EXPERIMENTAL_tx_status.yaml',
     params: {
       tx_hash:            { mainnet: d => d.txHash,    testnet: d => d.txHash },

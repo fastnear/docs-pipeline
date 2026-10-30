@@ -12,7 +12,7 @@ mike-docs/
 │   ├── block/                  # 3 operations (block_by_height, block_by_id, block_effects)
 │   ├── contract/               # 5 operations (call, view_code, view_state, ...)
 │   ├── protocol/               # 20 operations (status, health, gas_price, genesis_config, EXPERIMENTAL_*, ...)
-│   ├── transaction/            # 6 operations (tx_status, send_tx, broadcast_tx_async, ...)
+│   ├── transaction/            # 8 operations (tx_status, tx, send_tx, broadcast_tx_async, ...)
 │   └── validators/             # 3 operations (validators_current, validators_by_epoch, ...)
 ├── apis/                       # Portal-owned per-operation REST API pages, split from sibling aggregate specs
 │   ├── fastnear/

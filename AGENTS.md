@@ -24,7 +24,7 @@ npm run generate-rpc         # Regenerate rpcs/*.yaml from nearcore OpenAPI spec
 
 ### Per-Operation YAML Files (`rpcs/`)
 
-Each RPC method has its own self-contained OpenAPI YAML file under `rpcs/<category>/`. There are 40 operations across 6 categories: account, block, contract, protocol, transaction, validators.
+Each RPC method has its own self-contained OpenAPI YAML file under `rpcs/<category>/`. There are 42 operations across 6 categories: account, block, contract, protocol, transaction, validators.
 
 The aggregate spec `rpcs/openapi.yaml` uses `$ref` to reference all individual operations.
 
@@ -77,7 +77,7 @@ rpcs/openapi.yaml                              (aggregate spec)
 
 ### Key files
 
-- **`scripts/nearcore-operation-map.js`** — Exports `OPERATIONS` array (40 entries), `LEAF_TYPE_MAP` (type simplifications), `DEPRECATED_METHODS`, `PARAM_DESCRIPTIONS`, and schema constants. Each operation entry has: `type`, `file`, `category`, `operationId`, `summary`, `description`, and type-specific fields.
+- **`scripts/nearcore-operation-map.js`** — Exports `OPERATIONS` array (42 entries), `LEAF_TYPE_MAP` (type simplifications), `DEPRECATED_METHODS`, `PARAM_DESCRIPTIONS`, and schema constants. Each operation entry has: `type`, `file`, `category`, `operationId`, `summary`, `description`, and type-specific fields.
 - **`scripts/generate-from-nearcore.js`** — Reads the nearcore OpenAPI spec + operation map, decomposes compound endpoints (e.g., `/query` → `view_account`, `view_code`, etc.), flattens nearcore schemas to self-contained definitions, writes per-operation YAML files. Custom YAML serializer (no external deps).
 
 ### Operation types
@@ -103,9 +103,10 @@ rpcs/openapi.yaml                              (aggregate spec)
 ### Adding a new RPC operation
 
 1. Add an entry to `OPERATIONS` in `scripts/nearcore-operation-map.js`
-2. Run `npm run generate-rpc`
-3. Review generated YAML under `rpcs/<category>/`
-4. Add the corresponding MDX wrapper in `builder-docs` (see its CLAUDE.md for the `FastnearDirectOperation` pattern)
+2. Bump the category count in all three count tables, or page-model generation throws: `EXPECTED_FAMILY_COUNTS` in `scripts/audit-page-model-routes.js`, `EXPECTED_FAMILY_OPERATION_COUNTS` in `scripts/structured-graph-common.js`, and `EXPECTED_FAMILY_COUNTS` in builder-docs `scripts/audit-generated-page-models.js`
+3. Run `npm run generate-rpc` (pass the clean tag worktree's `openapi.json` path so `shared/generatedNearcoreSource.json` records `dirty: false`)
+4. Review generated YAML under `rpcs/<category>/`
+5. Add the corresponding MDX wrapper in `builder-docs` (see its CLAUDE.md for the `FastnearDirectOperation` pattern)
 
 ### Regenerating after nearcore changes
 

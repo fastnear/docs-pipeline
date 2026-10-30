@@ -1,12 +1,12 @@
 {
   "branch": "HEAD",
-  "commitSha": "5af9ca74631e6cf0dae33e77d1a632e94d2952ce",
+  "commitSha": "bc4e9e8cfb03d9e82f027883055624e18576993e",
   "dirty": false,
-  "generatedAt": "2026-09-24T03:01:23.704Z",
-  "releaseUrl": "https://github.com/near/nearcore/releases/tag/2.13.3",
-  "repoRoot": "../nearcore-2.13.3",
+  "generatedAt": "2026-10-30T18:36:37.768Z",
+  "releaseUrl": "https://github.com/near/nearcore/releases/tag/2.14.0",
+  "repoRoot": "../nearcore-2.14.0",
   "repoUrl": "https://github.com/near/nearcore",
-  "specPath": "../nearcore-2.13.3/chain/jsonrpc/openapi/openapi.json",
-  "tag": "2.13.3",
+  "specPath": "../nearcore-2.14.0/chain/jsonrpc/openapi/openapi.json",
+  "tag": "2.14.0",
   "tagSource": "exact"
 }
