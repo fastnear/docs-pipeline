@@ -217,7 +217,7 @@ function flattenSchema(spec, schema, depth = 0, maxDepth = 2) {
 
 /**
  * Given a nearcore response schema name like
- * "JsonRpcResponse_for_RpcBlockResponse_and_RpcError",
+ * "JsonRpcResponse_for_RpcBlockResponse_and_RpcBlockError",
  * extract and flatten the success result type.
  */
 function extractResponseSchema(spec, responseSchemaName) {
@@ -758,6 +758,14 @@ function getParamsSchema(spec, op) {
   }
 }
 
+// nearcore path whose 200 response a decomposed variant type shares.
+const DECOMPOSED_VARIANT_SOURCE_PATHS = {
+  block_variant: '/block',
+  chunk_variant: '/chunk',
+  gas_variant: '/gas_price',
+  validators_variant: '/validators',
+};
+
 /**
  * Get the flattened response result schema for an operation.
  */
@@ -773,20 +781,23 @@ function getResponseResult(spec, op) {
     return { type: 'object' };
   }
 
-  if (op.type === 'block_variant') {
-    return extractResponseSchema(spec, 'JsonRpcResponse_for_RpcBlockResponse_and_RpcError');
-  }
-
-  if (op.type === 'chunk_variant') {
-    return extractResponseSchema(spec, 'JsonRpcResponse_for_RpcChunkResponse_and_RpcError');
-  }
-
-  if (op.type === 'gas_variant') {
-    return extractResponseSchema(spec, 'JsonRpcResponse_for_RpcGasPriceResponse_and_RpcError');
-  }
-
-  if (op.type === 'validators_variant') {
-    return extractResponseSchema(spec, 'JsonRpcResponse_for_RpcValidatorResponse_and_RpcError');
+  // Decomposed variants share the response of the nearcore path they split
+  // from, so resolve the schema name from that path's 200 response instead of
+  // hardcoding it. The names used to be hardcoded as
+  // `JsonRpcResponse_for_Rpc<X>Response_and_RpcError`, which nearcore never
+  // emitted (its error types are per-method: RpcBlockError, RpcChunkError, …),
+  // so these results silently fell back to `{ type: 'object' }` and the YAML
+  // kept whatever result it already had. Fail loudly rather than repeat that.
+  const sourcePath = DECOMPOSED_VARIANT_SOURCE_PATHS[op.type];
+  if (sourcePath) {
+    const schemaName = getResponseSchemaName(spec.paths?.[sourcePath]);
+    if (!schemaName || !spec.components?.schemas?.[schemaName]) {
+      throw new Error(
+        `Cannot resolve the response schema for ${op.operationId} (${op.type}): ` +
+        `nearcore path ${sourcePath} has no resolvable 200 response $ref (got ${schemaName}).`
+      );
+    }
+    return extractResponseSchema(spec, schemaName);
   }
 
   if (op.type === 'simple' && op.nearcorePath) {
