@@ -1,5 +1,9 @@
 # DRAFT — nearcore issue: backfill field-level `///` docs on JSON-RPC view types
 
+> **Status 2026-10-30:** nearcore 2.14.0 added `///` docs on `RpcViewStateRequest` (`after_key_base64`, `limit`, `last_key`)
+> and `RpcViewAccessKeyListRequest` (`after_key`, `limit`), but the `/query` `*_by_finality` variants that the portal
+> generator reads are still undocumented, so the curation in `scripts/nearcore-operation-map.js` stays for now.
+
 > Draft for Mike to review and open at https://github.com/near/nearcore/issues
 > Scope is intentionally tight (the new 2.13.0 `view_state` pagination fields) with an
 > optional broader section (foundational view types). Cut the broader section if you

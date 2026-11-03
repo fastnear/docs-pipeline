@@ -27,6 +27,7 @@ const SUBSET_OPERATION_IDS = [
   'chunk_by_hash',
   'changes',
   'tx_status',
+  'tx',
   'light_client_proof',
   'validators_by_epoch',
 ];
@@ -175,6 +176,7 @@ const ARCHIVAL_EXAMPLES = {
   EXPERIMENTAL_receipt_to_tx: { reason: 'Pinned receipt plus block_height anchor, older than standard RPC retention.' },
   EXPERIMENTAL_tx_status: { reason: 'Pinned transaction, older than standard RPC retention.' },
   tx_status: { reason: 'Pinned transaction, older than standard RPC retention.' },
+  tx: { reason: 'Pinned transaction, older than standard RPC retention.' },
   EXPERIMENTAL_validators_ordered: { reason: 'Pinned epoch, older than standard RPC retention.' },
   validators_by_epoch: { reason: 'Pinned epoch, older than standard RPC retention.' },
 };

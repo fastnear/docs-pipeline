@@ -96,6 +96,8 @@ paths:
     $ref: './transaction/broadcast_tx_commit.yaml#/paths/~1'
   /tx_status:
     $ref: './transaction/tx_status.yaml#/paths/~1'
+  /tx:
+    $ref: './transaction/tx.yaml#/paths/~1'
   /send_tx:
     $ref: './transaction/send_tx.yaml#/paths/~1'
   /EXPERIMENTAL_tx_status:

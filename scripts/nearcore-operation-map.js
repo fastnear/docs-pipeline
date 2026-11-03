@@ -120,6 +120,12 @@ const OPERATIONS = [
     operationId: 'view_account',
     summary: 'View account',
     description: "Fetch an account's balance, storage usage, and code hash at a chosen block or finality.",
+    fieldDescriptions: {
+      response: {
+        // nearcore's own text is "Deprecated and unused. TODO(2271): remove."
+        storage_paid_at: 'Deprecated and unused; nodes always return 0.',
+      },
+    },
     exampleParamsByNetwork: {
       mainnet: {
         account_id: 'root.near',
@@ -144,7 +150,7 @@ const OPERATIONS = [
     category: 'account',
     operationId: 'view_access_key',
     summary: 'View access key',
-    description: "Fetch one access key's permissions and nonce by public key on a given account. Pass the full public key with its type prefix. For an ML-DSA-65 key that is the full ml-dsa-65: key, not the ml-dsa-65-hash: handle that view_access_key_list reports; the handle is rejected with a parse error (unknown key type).",
+    description: "Fetch one access key's permissions and nonce by public key on a given account. Pass the full public key with its type prefix — for ML-DSA-65 the ml-dsa-65: key, not the ml-dsa-65-hash: handle, which is rejected as an unknown key type.",
     exampleParamsByNetwork: {
       mainnet: {
         account_id: 'root.near',
@@ -171,7 +177,20 @@ const OPERATIONS = [
     category: 'account',
     operationId: 'view_access_key_list',
     summary: 'View access key list',
-    description: "Fetch every access key attached to an account, each with its permissions and nonce. ML-DSA-65 keys are listed by their ml-dsa-65-hash: handle; to query one with view_access_key, or to reference it in an action, use the full ml-dsa-65: public key instead.",
+    description: "Fetch every access key attached to an account, each with its permissions and nonce. ML-DSA-65 keys are listed by their ml-dsa-65-hash: handle; query or reference one with the full ml-dsa-65: public key instead.",
+    // nearcore 2.14.0 added these pagination fields to the /query variant with
+    // no `///` docs (the annotations live on RpcViewAccessKeyListRequest, which
+    // this generator does not read). The response `last_key` inherits the
+    // upstream AccessKeyList description.
+    fieldDescriptions: {
+      request: {
+        after_key: "Exclusive pagination cursor — the `last_key` handle returned by the previous page; omit to start from the first key.",
+        limit: 'Maximum access keys per response (≥ 1). Omit for no client-set bound; the node caps it at its `view_access_keys_limit`.',
+      },
+      response: {
+        last_key: 'Pagination cursor — the handle of the last key returned when the listing was truncated. Pass it as `after_key` to fetch the next page; absent on the last page.',
+      },
+    },
     exampleParamsByNetwork: {
       mainnet: {
         account_id: 'root.near',
@@ -290,10 +309,12 @@ const OPERATIONS = [
     operationId: 'view_state',
     summary: 'View contract state',
     description: "Fetch the raw key-value state a contract has written, optionally filtered by key prefix.",
-    // nearcore ships the 2.13.0 pagination fields with no `///` docs, so they
-    // fall back to the generic StoreKey leaf description ("Base64-encoded
-    // storage key") or render blank. Curate their pagination role here until
-    // the upstream annotations land (see drafts/nearcore-openapi-field-descriptions-issue.md).
+    // nearcore 2.14.0 documents these pagination fields on RpcViewStateRequest,
+    // but the /query `view_state_by_finality` variant this generator reads is
+    // still blank, so they would fall back to the generic StoreKey leaf
+    // description ("Base64-encoded storage key") or render blank. Keep curating
+    // their pagination role here until the /query variants carry the
+    // annotations (see drafts/nearcore-openapi-field-descriptions-issue.md).
     fieldDescriptions: {
       request: {
         prefix_base64: 'Base64-encoded key prefix; returns only trie entries whose key begins with these bytes. Empty string (`""`) removes the filter and returns the entire contract state — expensive on large contracts.',
@@ -513,12 +534,12 @@ const OPERATIONS = [
   },
   {
     type: 'simple',
-    nearcorePath: '/tx',
+    nearcorePath: '/tx_status',
     file: 'transaction/tx_status.yaml',
     category: 'transaction',
     operationId: 'tx_status',
     summary: 'Get transaction status',
-    description: "Check a transaction's final outcome by Base58 hash — succeeded, failed, or still unresolved.",
+    description: "Check a transaction's final outcome by Base58 hash and get every receipt it produced — succeeded, failed, or still unresolved.",
     fieldDescriptions: {
       request: {
         signed_tx_base64: "Base64-encoded Borsh serialization of a `SignedTransaction`; must be freshly signed (nonce above the access key's current value).",
@@ -528,6 +549,36 @@ const OPERATIONS = [
       mainnet: {
         tx_hash: 'ESShk21GZb6cgFRoJyEJqdJXuoP72fuCmCn6pNMhXFC7',
         sender_account_id: '00000000012.near',
+      },
+    },
+  },
+  {
+    // Legacy `tx` (nearcore 2.14.0 split it from the new `tx_status`): same
+    // params and the same RpcTransactionResponse type, but the live node omits
+    // the `receipts` array that `tx_status` returns.
+    type: 'simple',
+    nearcorePath: '/tx',
+    file: 'transaction/tx.yaml',
+    category: 'transaction',
+    operationId: 'tx',
+    summary: 'Get transaction result',
+    description: "Check a transaction's final outcome by Base58 hash without the receipt list — the lighter form of `tx_status`.",
+    fieldDescriptions: {
+      request: {
+        signed_tx_base64: "Base64-encoded Borsh serialization of a `SignedTransaction`; must be freshly signed (nonce above the access key's current value).",
+      },
+      response: {
+        receipts: 'Only `tx_status` returns this list; the legacy `tx` method omits it.',
+      },
+    },
+    exampleParamsByNetwork: {
+      mainnet: {
+        tx_hash: '34E7weKCDqXh3xPKdBgSWRqo44yTWjbka9deMK8JbAxx',
+        sender_account_id: 'escrow.ai.near',
+      },
+      testnet: {
+        tx_hash: '9LPbkwJ26HYgda7KHrURc6jozBcpdA1kUMSEzwm81JPx',
+        sender_account_id: 'near-mpc-staking4all-01.testnet',
       },
     },
   },
@@ -569,7 +620,7 @@ const OPERATIONS = [
     category: 'transaction',
     operationId: 'EXPERIMENTAL_tx_status',
     summary: 'Get detailed transaction status',
-    description: "Fetch a transaction's full receipt tree and per-receipt outcomes by Base58 hash — richer than `tx_status`.",
+    description: "Fetch a transaction's full receipt tree and per-receipt outcomes by Base58 hash. Deprecated in nearcore 2.14 — prefer `tx_status`, which returns the same receipts.",
     fieldDescriptions: {
       request: {
         signed_tx_base64: "Base64-encoded Borsh serialization of a `SignedTransaction`; must be freshly signed (nonce above the access key's current value).",

@@ -14,6 +14,7 @@ const OPERATIONS = [
   '/rpcs/account/view_access_key',
   '/rpcs/block/block_by_height',
   '/rpcs/transaction/tx_status',
+  '/rpcs/transaction/tx',
   '/apis/fastnear/v1/account_full',
   '/apis/fastnear/v1/account_full?preset=ecosystem-account',
   '/apis/transactions/v0/transactions',
